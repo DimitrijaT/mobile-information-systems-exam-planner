@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_planner/custom/Parser.dart';
 import 'package:exam_planner/widgets/new_exam_date.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _auth = FirebaseAuth.instance;
+  final db = FirebaseFirestore.instance;
   late User loggedinUser;
 
   final List<ExamDate> _examDates = [];
@@ -25,9 +27,23 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getCurrentUser();
+    _getExamDates();
   }
 
-  //using this function you can use the credentials of the user
+  void _getExamDates() async {
+    final examDates = await db.collection("examDates").get();
+    setState(() {
+      _examDates.clear();
+      for (var element in examDates.docs) {
+        if (element["userId"] == loggedinUser.uid) {
+          _examDates.add(
+              ExamDate(0, element["examSubject"], element["dateTime"], false));
+        }
+      }
+    });
+  }
+
+//using this function you can use the credentials of the user
   void getCurrentUser() async {
     try {
       final user = _auth.currentUser;
@@ -42,6 +58,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void _addExamDateToList(ExamDate examDate) {
     setState(() {
       _examDates.add(examDate);
+    });
+    db.collection("examDates").add({
+      "examSubject": examDate.examSubject,
+      "dateTime": examDate.dateTime,
+      "userId": loggedinUser.uid,
     });
   }
 
@@ -60,22 +81,25 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: null,
+        leading: IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              _auth.signOut();
+              Navigator.pop(context);
+              Navigator.pop(context);
+              //Implement logout functionality
+            }),
         actions: <Widget>[
           IconButton(
               onPressed: _addExamDate,
               icon: const Icon(Icons.add_alert_outlined)),
-          IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                _auth.signOut();
-                Navigator.pop(context);
-                //Implement logout functionality
-              }),
         ],
         title: FittedBox(
           fit: BoxFit.fitWidth,
-          child: Text("Welcome ${Parser.parseEmail(loggedinUser.email!)}"),
+          child: Row(children: [
+            // const Icon(Icons.calendar_today_outlined),
+            Text(" Welcome ${Parser.parseEmail(loggedinUser.email!)}")
+          ]),
         ),
         backgroundColor: Colors.lightBlueAccent,
       ),
@@ -93,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text(
                       _examDates[index].examSubject,
                       style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       Parser.parseDateTime(_examDates[index].dateTime),
