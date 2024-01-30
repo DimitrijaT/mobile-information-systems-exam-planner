@@ -1,15 +1,18 @@
 import 'package:exam_planner/pages/auth/login_page.dart';
 import 'package:exam_planner/pages/auth/registration_page.dart';
-import 'package:exam_planner/pages/auth/welcome_page.dart';
+import 'package:exam_planner/pages/splashscreen.dart';
+import 'package:exam_planner/pages/welcome_page.dart';
 import 'package:exam_planner/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl_standalone.dart'
+    if (dart.library.html) 'package:intl/intl_browser.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Firebase.initializeApp();
+  await findSystemLocale();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -22,12 +25,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      //   useMaterial3: true,
-      // ),
-      initialRoute: '/welcome_page',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey),
+        useMaterial3: true,
+      ),
+      initialRoute: '/splashscreen',
       routes: <String, WidgetBuilder>{
+        '/splashscreen': (BuildContext context) => const Splashscreen(),
         '/welcome_page': (BuildContext context) => const WelcomePage(),
         '/login_page': (BuildContext context) => const LoginPage(),
         '/registration_page': (BuildContext context) =>
