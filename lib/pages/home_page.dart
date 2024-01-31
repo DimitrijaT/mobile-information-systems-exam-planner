@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:exam_planner/custom/Parser.dart';
+import 'package:exam_planner/custom/parser.dart';
 import 'package:exam_planner/widgets/new_exam_date.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/ExamDate.dart';
+import 'calendar/event_calendar.dart';
+import 'calendar/utils.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -77,8 +80,26 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  _openCalendar() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => CalendarPage(
+                kEvents: CalendarUtils.listToLinkedHashMap(_examDates))));
+    // Navigator.pushNamed(context, '/calendar',
+    //     arguments: Converter.listToLinkedHashMap(_examDates));
+  }
+
   @override
   Widget build(BuildContext context) {
+    var message = " Welcome ${Parser.parseEmail(loggedinUser.email!)}";
+    // get the notification message and display on screen
+    if (ModalRoute.of(context)!.settings.arguments != null) {
+      var notificationMessage =
+          ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+      message = notificationMessage.notification!.body!;
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -93,12 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
               onPressed: _addExamDate,
               icon: const Icon(Icons.add_alert_outlined)),
+          IconButton(
+              onPressed: _openCalendar, icon: const Icon(Icons.calendar_month)),
         ],
         title: FittedBox(
           fit: BoxFit.fitWidth,
           child: Row(children: [
             // const Icon(Icons.calendar_today_outlined),
-            Text(" Welcome ${Parser.parseEmail(loggedinUser.email!)}")
+            Text(message)
           ]),
         ),
         backgroundColor: Colors.lightBlueAccent,
