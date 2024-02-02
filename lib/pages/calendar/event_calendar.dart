@@ -1,4 +1,4 @@
-import 'package:exam_planner/pages/calendar/utils.dart';
+import 'package:exam_planner/pages/calendar/calendar_utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:table_calendar/table_calendar.dart';

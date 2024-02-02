@@ -4,5 +4,11 @@ class ExamDate {
   String dateTime;
   bool done;
 
-  ExamDate(this.id, this.examSubject, this.dateTime, this.done);
+  double latitude;
+  double longitude;
+
+  // String address;
+
+  ExamDate(this.id, this.examSubject, this.dateTime, this.done, this.longitude,
+      this.latitude);
 }

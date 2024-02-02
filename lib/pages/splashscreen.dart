@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../custom/logo.dart';
+
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
 
@@ -21,15 +23,6 @@ class _SplashscreenState extends State<Splashscreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.purple[50],
-        child: Center(
-            child: Text("Exam Planner App",
-                style: TextStyle(
-                    color: Colors.deepPurple[800],
-                    fontSize: 36.0,
-                    fontWeight: FontWeight.w700,
-                    decoration: TextDecoration.none,
-                    fontFamily: "Roboto"))));
+    return const LogoWithText();
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:exam_planner/custom/parser.dart';
-import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../models/ExamDate.dart';
@@ -19,9 +18,9 @@ class Event {
 
 class CalendarUtils {
   static LinkedHashMap<DateTime, List<Event>> listToLinkedHashMap(
-      List<ExamDate> _examDates) {
+      List<ExamDate> examDates) {
     var kEventSource = {
-      for (var e in _examDates)
+      for (var e in examDates)
         DateTime.parse(e.dateTime): [
           Event(e.examSubject, Parser.getTimeFromDateTimeString(e.dateTime))
         ]

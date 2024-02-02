@@ -1,6 +1,8 @@
 import 'package:exam_planner/custom/rounded_button.dart';
 import 'package:flutter/material.dart';
 
+import '../custom/logo.dart';
+
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
 
@@ -19,6 +21,7 @@ class _WelcomePageState extends State<WelcomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                const LogoWithText(),
                 RoundedButton(
                   colour: Colors.lightBlueAccent,
                   title: 'Log In',

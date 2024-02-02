@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:exam_planner/custom/parser.dart';
+import 'package:exam_planner/pages/maps/event_map.dart';
 import 'package:exam_planner/widgets/new_exam_date.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../models/ExamDate.dart';
 import 'calendar/event_calendar.dart';
-import 'calendar/utils.dart';
+import 'calendar/calendar_utils.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -39,8 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
       _examDates.clear();
       for (var element in examDates.docs) {
         if (element["userId"] == loggedinUser.uid) {
-          _examDates.add(
-              ExamDate(0, element["examSubject"], element["dateTime"], false));
+          _examDates.add(ExamDate(
+              0,
+              element["examSubject"],
+              element["dateTime"],
+              element["done"],
+              element["longitude"],
+              element["latitude"]));
         }
       }
     });
@@ -66,17 +71,26 @@ class _MyHomePageState extends State<MyHomePage> {
       "examSubject": examDate.examSubject,
       "dateTime": examDate.dateTime,
       "userId": loggedinUser.uid,
+      "done": examDate.done,
+      "latitude": examDate.latitude,
+      "longitude": examDate.longitude
+      // "date_created": FieldValue.serverTimestamp(),
     });
   }
 
   _addExamDate() {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (_) {
-          return GestureDetector(
-              onTap: () {},
-              behavior: HitTestBehavior.opaque,
-              child: NewExamDate(addExamDate: _addExamDateToList));
+          return FractionallySizedBox(
+            heightFactor: 0.9,
+            child: GestureDetector(
+                onTap: () {},
+                behavior: HitTestBehavior.opaque,
+                child: NewExamDate(addExamDate: _addExamDateToList)),
+            // child: const GeocodeWidget()), // Testing Geocoding Widget
+          );
         });
   }
 
@@ -86,6 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(
             builder: (_) => CalendarPage(
                 kEvents: CalendarUtils.listToLinkedHashMap(_examDates))));
+    // Navigator.pushNamed(context, '/calendar',
+    //     arguments: Converter.listToLinkedHashMap(_examDates));
+  }
+
+  _openMaps() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EventMapPage(
+                _examDates)));
     // Navigator.pushNamed(context, '/calendar',
     //     arguments: Converter.listToLinkedHashMap(_examDates));
   }
@@ -114,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
               onPressed: _addExamDate,
               icon: const Icon(Icons.add_alert_outlined)),
+          IconButton(onPressed: _openMaps, icon: const Icon(Icons.map)),
           IconButton(
               onPressed: _openCalendar, icon: const Icon(Icons.calendar_month)),
         ],
